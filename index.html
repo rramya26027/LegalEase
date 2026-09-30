@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LegalEase - AI Legal Document Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f9; }
+        .container { max-width: 650px; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: auto; }
+        h2 { color: #1a365d; text-align: center; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, textarea, button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        button:hover { background: #1d4ed8; }
+        #result { margin-top: 20px; white-space: pre-wrap; background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #e2e8f0; font-family: monospace; max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>LegalEase AI Document Generator</h2>
+    
+    <label>Document Type:</label>
+    <input type="text" id="docType" placeholder="e.g., Rental Agreement, NDA, Contract">
+    
+    <label>Details:</label>
+    <textarea id="details" rows="5" placeholder="Enter names, terms, amount, location, dates..."></textarea>
+    
+    <button onclick="generateDoc()">Generate Legal Document</button>
+
+    <h3>Output:</h3>
+    <div id="result">Your generated document will appear here...</div>
+</div>
+
+<script>
+async function generateDoc() {
+    const docType = document.getElementById('docType').value;
+    const details = document.getElementById('details').value;
+    const resultDiv = document.getElementById('result');
+
+    if (!docType || !details) {
+        alert("Please fill in both fields!");
+        return;
+    }
+
+    resultDiv.innerText = "Generating legal document using AI... Please wait...";
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/generate-document', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ doc_type: docType, details: details })
+        });
+        
+        const data = await response.json();
+        if(data.document) {
+            resultDiv.innerText = data.document;
+        } else {
+            resultDiv.innerText = "Error: " + JSON.stringify(data);
+        }
+    } catch (error) {
+        resultDiv.innerText = "Error connecting to backend server. Make sure FastAPI is running.";
+    }
+}
+</script>
+
+</body>
+</html>
